@@ -6,7 +6,8 @@ import javax.swing.UIManager;
 import com.formdev.flatlaf.FlatLaf; // <--- Correct import for LookAndFeel object
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.awt.Font; // Ensure Font is imported for the put call
+import java.awt.Font;
+import javax.swing.WindowConstants;// Ensure Font is imported for the put call
 
 /**
  * Main application class to launch the GUI frame with FlatLaf MacLight Theme.
@@ -29,9 +30,11 @@ public class MainApp {
         }
 
         // Launch the GUI on the Event Dispatch Thread (EDT)
+        // Launch the Gallery Frame (the new entry point)
         SwingUtilities.invokeLater(() -> {
-
-            BookingFrame frame = new BookingFrame();
+            MovieGalleryFrame frame = new MovieGalleryFrame();
+// Use WindowConstants to correctly reference the exit constant
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });

@@ -41,6 +41,8 @@ public class BookingFrame extends JFrame {
     private JButton btnGeneratePdfBill;
     private JButton btnClearCart;
     private JLabel lblStatus;
+    private String initialShowtimeKey;
+    private JButton btnBack;
 
     // Animation/State Management
     private Timer statusTimer; // For blinking animation
@@ -50,7 +52,9 @@ public class BookingFrame extends JFrame {
     private static final Logger logger = Logger.getLogger(BookingFrame.class.getName());
 
     // --- 2. CONSTRUCTOR ---
-    public BookingFrame() {
+    public BookingFrame(String initialKey) {
+        this.initialShowtimeKey = initialKey;
+
         // UIManager is handled by MainApp.java
 
         initializeComponents();
@@ -59,13 +63,14 @@ public class BookingFrame extends JFrame {
         statusTimer = new Timer(300, this::statusTimerAction);
         statusTimer.setInitialDelay(0);
 
-        loadShowtimes();
+        // Calls loadShowtimes with the selected key
+        loadShowtimes(initialKey);
         updateSeatMap();
         updateBillSummary();
 
         setTitle("Movie Ticket Booking");
         setSize(1000, 750);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     // Animation Action
@@ -85,10 +90,14 @@ public class BookingFrame extends JFrame {
     private void initializeComponents() {
         setLayout(new BorderLayout(15, 15));
 
-        // --- NORTH PANEL (Title & Selector) ---
-        JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 15));
+        // --- NORTH PANEL (Title, Selector & Back Button) ---
+        // Use BorderLayout for the North container to place the Back button on the left (West)
+        JPanel northContainer = new JPanel(new BorderLayout());
 
-        JLabel titleLabel = new JLabel("🎥 Movie Ticket Booking");
+        // Center portion (Title and Selector)
+        JPanel centerNorth = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 15));
+
+        JLabel titleLabel = new JLabel("Movie Booking");
         titleLabel.setFont(new Font("Roboto", Font.BOLD, 28));
         titleLabel.setForeground(PRIMARY_BLUE);
 
@@ -96,11 +105,24 @@ public class BookingFrame extends JFrame {
         cmbShowtime.setPreferredSize(new Dimension(300, 35));
         cmbShowtime.addActionListener(this::cmbShowtimeActionPerformed);
 
-        northPanel.add(titleLabel);
-        northPanel.add(new JLabel("Select Show:"));
-        northPanel.add(cmbShowtime);
+        centerNorth.add(titleLabel);
+        centerNorth.add(new JLabel("Select Show:"));
+        centerNorth.add(cmbShowtime);
 
-        add(northPanel, BorderLayout.NORTH);
+        northContainer.add(centerNorth, BorderLayout.CENTER); // Add center portion
+
+        // Back Button (Placed on the West/Left side)
+        btnBack = new JButton("← Back to Movies");
+        btnBack.setFont(new Font("Arial", Font.BOLD, 14));
+        btnBack.addActionListener(this::btnBackActionPerformed);
+
+        // Add padding around the back button
+        JPanel westWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
+        westWrapper.add(btnBack);
+
+        northContainer.add(westWrapper, BorderLayout.WEST); // Add back button wrapper
+
+        add(northContainer, BorderLayout.NORTH);
 
         // --- CENTER PANEL (Screen Indicator and Graphical Seats) ---
 
@@ -110,10 +132,10 @@ public class BookingFrame extends JFrame {
         // 2. SCREEN INDICATOR (North of the center panel)
         pnlScreenIndicator = new JPanel();
         pnlScreenIndicator.setPreferredSize(new Dimension(500, 50));
-        pnlScreenIndicator.setBackground(new Color(66, 132, 242));
+        pnlScreenIndicator.setBackground(new Color(135, 206, 235)); // Light Sky Blue
 
-        JLabel screenLabel = new JLabel(" S C R E E N  I S  H E R E ");
-        screenLabel.setForeground(Color.WHITE);
+        JLabel screenLabel = new JLabel("<< S C R E E N  I S  H E R E >>");
+        screenLabel.setForeground(Color.DARK_GRAY);
         screenLabel.setFont(new Font("Arial", Font.BOLD, 18));
         pnlScreenIndicator.add(screenLabel);
         centerContainer.add(pnlScreenIndicator, BorderLayout.NORTH);
@@ -168,20 +190,53 @@ public class BookingFrame extends JFrame {
         // --- SOUTH PANEL (Status Bar) ---
         lblStatus = new JLabel("Welcome to the advanced booking system.");
         lblStatus.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(lblStatus, BorderLayout.SOUTH);
+        // --- NEW: PROJECT FOOTER & STATUS CONTAINER ---
+
+// Create the Footer Label
+        JLabel footerLabel = new JLabel("Created by Adhithyan K J and Team", SwingConstants.CENTER);
+        footerLabel.setFont(new Font("Arial", Font.ITALIC, 10));
+        footerLabel.setForeground(Color.GRAY.darker());
+        footerLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); // Padding
+
+// Create a South container (using BorderLayout) to hold both Status and Footer
+        JPanel southContainer = new JPanel(new BorderLayout());
+
+// Add the Status Bar (lblStatus) to the NORTH of the container (this is the main status bar area)
+        southContainer.add(lblStatus, BorderLayout.NORTH);
+
+// Add the new Footer Label to the SOUTH of the container (the very bottom)
+        southContainer.add(footerLabel, BorderLayout.SOUTH);
+
+// Finally, add this new container to the JFrame's south position
+        add(southContainer, BorderLayout.SOUTH);
     }
+
+
 
     // --- 4. CORE LOGIC METHODS ---
 
-    private void loadShowtimes() {
+    private void loadShowtimes(String initialKey) {
         cmbShowtime.removeAllItems();
-        for (String key : BookingManager.getAllShowtimes().keySet()) {
-            cmbShowtime.addItem(key);
-        }
-        if (cmbShowtime.getItemCount() > 0) {
-            cmbShowtime.setSelectedIndex(0);
-        }
+
+        // Only load the movie selected on the gallery screen
+        cmbShowtime.addItem(initialKey);
+        cmbShowtime.setSelectedIndex(0);
     }
+
+
+
+    private void btnBackActionPerformed(ActionEvent evt) {
+        // Close the current frame
+        this.dispose();
+
+        // Open the Movie Gallery frame
+        MovieGalleryFrame gallery = new MovieGalleryFrame();
+        gallery.setLocationRelativeTo(null);
+        gallery.setVisible(true);
+    }
+
+
+
 
     private void updateSeatMap() {
         String selectedKey = (String) cmbShowtime.getSelectedItem();
@@ -283,6 +338,11 @@ public class BookingFrame extends JFrame {
     // --- 5. ACTION LISTENERS ---
 
     private void cmbShowtimeActionPerformed(ActionEvent evt) {
+        String selectedKey = (String) cmbShowtime.getSelectedItem();
+        if (selectedKey != null) {
+            // Explicitly set the current showtime object
+            currentShowtime = BookingManager.getShowtime(selectedKey);
+        }
         selectedSeats.clear();
         updateSeatMap();
     }
@@ -455,10 +515,6 @@ public class BookingFrame extends JFrame {
         }
     }
 
-    // --- 6. MAIN METHOD (For direct testing) ---
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> {
-            new BookingFrame().setVisible(true);
-        });
-    }
+    // --- 6. MAIN METHOD (For direct testing), deleted ---
+
 }
