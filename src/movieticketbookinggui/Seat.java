@@ -1,15 +1,18 @@
 package movieticketbookinggui;
 
+/**
+ * Represents a single seat. Removed serialization support.
+ */
 public class Seat {
     private final String seatId;
     private boolean isBooked;
 
-    public Seat(String row, int number) {
-        this.seatId = row + number;
+    public Seat(String id) {
+        this.seatId = id;
         this.isBooked = false;
     }
 
-    // Encapsulation: Check status before booking
+    // Encapsulation: Marks seat as booked (used for selectedSeats cart check)
     public boolean book() {
         if (!isBooked) {
             isBooked = true;
@@ -19,7 +22,14 @@ public class Seat {
     }
 
     public void cancel() {
-        isBooked = false;
+        this.isBooked = false;
+    }
+
+    // NEW: Method used only during initial DB load to mark seat status
+    // This allows the database logic to permanently mark a seat as taken
+    // without running the interactive book() logic.
+    public void forceBook() {
+        this.isBooked = true;
     }
 
     // Getters

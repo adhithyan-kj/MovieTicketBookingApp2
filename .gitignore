@@ -1,2 +1,11 @@
 # Project exclude paths
 /out/
+
+# ----------------------------------
+# SECURITY: Database Configuration
+# ----------------------------------
+db_config.txt  # <-- CRITICAL: This hides your password file
+
+# ----------------------------------
+# IDE SPECIFIC FILES (IntelliJ/NetBeans)
+# ----------------------------------

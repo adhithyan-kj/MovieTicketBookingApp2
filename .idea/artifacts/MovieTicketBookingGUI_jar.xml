@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="MovieTicketBookingGUI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MovieTicketBookingGUI_jar</output-path>
+    <root id="archive" name="MovieTicketBookingGUI.jar">
+      <element id="module-output" name="MovieTicketBookingGUI" />
+      <element id="extracted-dir" path="D:/Chrome Downloads/Java Oracle files/pdfbox-app-3.0.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="D:/Chrome Downloads/Java Oracle files/flatlaf-3.6.2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
