@@ -49,3 +49,38 @@ The following features make this a strong, non-trivial mini-project:
 
 * **Real-time Cart:** The application maintains the `selectedSeats` list. The **Bill Summary** panel instantly updates the Subtotal, 18% GST, and **Total Payable** with every click.
 * **State Confirmation:** When the bill is paid, the selected seats are marked permanently **"Booked"** in the `Showtime` data model, and the final receipt remains displayed in the summary panel until the user clears the cart.
+
+
+## 💾 SQL Database Integration (JDBC)
+
+This project moves beyond simple in-memory storage to satisfy the requirement for **permanent, multi-user data persistence** by integrating a **MySQL database** using the **Java Database Connectivity (JDBC)** API.
+
+Any seat booked and paid for is immediately reflected in the central database, allowing other instances of the application to see the updated availability.
+
+### Architecture and Data Flow
+
+The project uses the **Data Access Object (DAO) pattern** to keep the business logic clean and separate from the SQL execution.
+
+This feature upgrades the project for **permanent data storage** and **multi-user, shared booking** by fulfilling the syllabus requirement for database integration. It uses **MySQL** via the **Java Database Connectivity (JDBC)** API.
+
+### Core Architecture and Data Flow
+
+The application uses the **Data Access Object (DAO) pattern** to securely handle all database communication.
+
+| File | Primary Role | Persistence Logic |
+| :--- | :--- | :--- |
+| **`DBConnection.java`** | Manages the secure, active connection to the MySQL Server. | Reads credentials from the hidden **`db_config.txt`** file. |
+| **`SeatDAO.java`** | Executes all SQL commands (`SELECT`, `INSERT`). | Queries the central `seat_status` table. |
+| **`Showtime.java`** | **Data Retrieval:** On initialization, calls `SeatDAO.getBookedSeats()` to check the permanent status. | Receives status from `SeatDAO`. |
+| **`BookingFrame.java`** | **Booking Logic:** Attempts an `INSERT` via the DAO when the bill is paid. | Finalizes the transaction in the database. |
+
+### Database Structure
+
+The project relies on a single table to track permanent availability:
+
+| Table Name | Primary Purpose | Columns (Data Stored) |
+| :--- | :--- | :--- |
+| **`seat_status`** | Permanently tracks reserved seats across all systems. | `seat_id` (e.g., A5) and `showtime_key` (e.g., KGF: Chapter 3 - 10:00 AM) |
+
+
+
